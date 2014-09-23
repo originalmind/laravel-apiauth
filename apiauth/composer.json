@@ -1,0 +1,31 @@
+{
+    "name": "originalmind/apiauth",
+    "description": "OAuth API Authorisation Filters",
+    "keywords": ["oauth","filter"],
+    "authors": [
+    {
+        "name": "Joe Niland",
+        "email": "joe@originalmind.com.au"
+    }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "lucadegasperi/oauth2-server-laravel": "dev-rewrite"
+        },
+        "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/lucadegasperi/oauth2-server-laravel"
+        }
+        ],
+        "autoload": {
+            "classmap": [
+            "src/migrations"
+            ],
+            "psr-0": {
+                "Originalmind\\Apiauth\\": "src/"
+            }
+            },
+            "minimum-stability": "stable"
+        }
