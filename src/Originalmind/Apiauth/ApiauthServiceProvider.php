@@ -19,6 +19,8 @@ class ApiauthServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		$this->package('originalmind/apiauth');
+
+		include __DIR__ . '/Filters/ApiAuthFilter.php';
 	}
 
 	/**
