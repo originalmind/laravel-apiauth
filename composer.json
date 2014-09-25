@@ -1,7 +1,8 @@
 {
     "name": "originalmind/apiauth",
     "description": "OAuth API Authorisation Filters",
-    "keywords": ["oauth","filter"],
+    "license": "MIT",
+    "keywords": ["oauth", "authorization", "filter"],
     "authors": [
     {
         "name": "Joe Niland",
@@ -10,21 +11,14 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "lucadegasperi/oauth2-server-laravel": "dev-rewrite"
+        "illuminate/support": "4.2.*"
         },
-        "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/lucadegasperi/oauth2-server-laravel"
-        }
-        ],
         "autoload": {
             "classmap": [
-            "src/migrations"
+                "src/migrations"
             ],
-            "psr-0": {
-                "Originalmind\\Apiauth\\": "src/"
+            "psr-4": {
+                "OriginalMind\\ApiAuth\\": "src/"
             }
             },
             "minimum-stability": "stable"
