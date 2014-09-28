@@ -1,13 +1,17 @@
 <?php
 /*
  * ApiAuthUserOwnerFilter
- * Checks that oauth token owner ID matches the user ID being displayed/modified.
+ * This filter is for use with Controllers orchestrating the display/modification of Users (or
+ * a custom User implementation.)
+ * Checks that oauth token owner ID matches the ID of the user account being displayed/modified.
  */
 
 namespace OriginalMind\ApiAuth\Filters;
 
 use App;
 use Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use \Exception;
 
 class ApiAuthUserOwnerFilter {
 
@@ -17,9 +21,21 @@ class ApiAuthUserOwnerFilter {
 		$this->resourceServerName = $resourceServerName;
 	}
 
-	public function filter() {
+	public function filter($route, $request, $modelName) {
 
 		Log::info("Running ApiAuthUserOwnerFilter");
+
+		$entityId = -1;
+
+		if ($route !== null) {
+			$entityId = $route->parameter($modelName);
+			Log::info("model name, entity id", [$modelName, $entityId]);
+		}
+
+		if ($entityId === -1) {
+			Log::error("Unable to retrieve entity id by model name:", [$modelName]);
+			return;
+		}
 
 		$resourceServer = App::make($this->resourceServerName);
 
@@ -29,15 +45,17 @@ class ApiAuthUserOwnerFilter {
 			return;
 		}
 
-		if (!$resourceServer->validateAccessToken()) {
-			Log::error("No access_token is present in this request.");
-			return;
+		if (!($resourceServer->validateAccessToken())) {
+			throw new Exception(
+				"No access token is present in this request.");
 		}
 
-		if (\Input::get("id") !== $resourceServer->getChecker()->getOwnerId()) {
-			return \Response::json(array(
-				'error' => 'Your access token is not valid for this operation',
-			), 403);
+		$accessTokenOwnerId = $resourceServer->getChecker()->getOwnerId();
+		Log::info("Access token owner id", [$accessTokenOwnerId]);
+
+		if ($entityId !== $accessTokenOwnerId) {
+			throw new HttpException(403,
+				"Your access token is not valid for this operation");
 		}
 
 	}
