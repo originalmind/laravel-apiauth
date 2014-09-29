@@ -1,26 +1,51 @@
 <?php
-/*
+namespace OriginalMind\ApiAuth\Filters;
+
+use Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+/**
  * ApiAuthUserOwnerFilter
+ *
  * This filter is for use with Controllers orchestrating the display/modification of Users (or
  * a custom User implementation.)
  * Checks that oauth token owner ID matches the ID of the user account being displayed/modified.
+ *
+ * @package OriginalMind\ApiAuth\Filters
+ * @since 0.1.0
  */
-
-namespace OriginalMind\ApiAuth\Filters;
-
-use App;
-use Log;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use \Exception;
-
 class ApiAuthUserOwnerFilter {
 
-	protected $resourceServerName;
+	protected $resourceServerIdCallback;
 
-	public function __construct($resourceServerName) {
-		$this->resourceServerName = $resourceServerName;
+	/**
+	 * Create the filter, specifying the method to retrieve the access token's owner ID from the
+	 * oauth resource server.
+	 *
+	 * @param function resourceServerIdCallback (provides a way to retrieve the owern ID
+	 * of the access token)
+	 * @since 0.1.0
+	 */
+	public function __construct($resourceServerIdCallback) {
+		$this->resourceServerIdCallback = $resourceServerIdCallback;
 	}
 
+	/**
+	 * Route filter - throws HttpException (403) if access token owner ID does not match the User
+	 * entity ID.
+	 *
+	 * <code>
+	 * <?php
+	 * $this->beforeFilter('apiauthuserowner:account', array('only' => array('show', 'update')));
+	 * ?>
+	 * </code>
+	 *
+	 * @param Route $route
+	 * @param Request $request
+	 * @param string $modelName (Used to find the entity ID in the route parameters.)
+	 * @return void
+	 * @since 0.1.0
+	 */
 	public function filter($route, $request, $modelName) {
 
 		Log::info("Running ApiAuthUserOwnerFilter");
@@ -37,21 +62,9 @@ class ApiAuthUserOwnerFilter {
 			return;
 		}
 
-		$resourceServer = App::make($this->resourceServerName);
+		$accessTokenOwnerId = call_user_func($this->resourceServerIdCallback);
 
-		// We can't compare the user credentials to the oauth token.
-		if ($resourceServer === null) {
-			Log::error("Unable to instantiate resourceServer");
-			return;
-		}
-
-		if (!($resourceServer->validateAccessToken())) {
-			throw new Exception(
-				"No access token is present in this request.");
-		}
-
-		$accessTokenOwnerId = $resourceServer->getChecker()->getOwnerId();
-		Log::info("Access token owner id", [$accessTokenOwnerId]);
+		Log::info("Access token owner id (returned from callback)", [$accessTokenOwnerId]);
 
 		if ($entityId !== $accessTokenOwnerId) {
 			throw new HttpException(403,
