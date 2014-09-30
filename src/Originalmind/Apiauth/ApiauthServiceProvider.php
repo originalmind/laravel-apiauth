@@ -1,6 +1,7 @@
 <?php
 namespace OriginalMind\ApiAuth;
 
+use Exception;
 use Illuminate\Support\ServiceProvider;
 
 /**
