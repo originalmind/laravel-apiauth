@@ -1,8 +1,8 @@
 {
     "name": "originalmind/apiauth",
-    "description": "OAuth API Authorisation Filters",
+    "description": "Laravel filters to implement common API authorisation tasks using OAuth.",
     "license": "MIT",
-    "keywords": ["oauth", "authorization", "filter"],
+    "keywords": ["laravel", "oauth", "authorization", "filter"],
     "authors": [
     {
         "name": "Joe Niland",
