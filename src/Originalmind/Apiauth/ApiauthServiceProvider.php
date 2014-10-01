@@ -76,9 +76,12 @@ class ApiAuthServiceProvider extends ServiceProvider {
 			throw new Exception("Unable to instantiate resourceServer");
 		}
 
-		if (!($resourceServer->validateAccessToken())) {
+		try {
+			$resourceServer->validateAccessToken();
+		} catch (Exception $e) {
 			throw new Exception(
-				"No access token is present in this request.");
+				"No access token is present in this request.",
+				0, $e);
 		}
 
 		$accessTokenOwnerId = $resourceServer->getChecker()->getOwnerId();
